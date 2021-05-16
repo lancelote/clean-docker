@@ -1,0 +1,56 @@
+import docker
+from docker import DockerClient
+
+
+def remove_images(client: DockerClient) -> bool:
+    images = client.images.list()
+    for image in images:
+        print(f"rm {image}")
+        client.images.remove(image=image.short_id, force=True)
+    return bool(images)
+
+
+def remove_containers(client: DockerClient) -> bool:
+    containers = client.containers.list(all=True)
+    for container in containers:
+        print(f"rm {container}")
+        container.remove(force=True)
+    return bool(containers)
+
+
+def remove_volumes(client: DockerClient) -> bool:
+    volumes = client.volumes.list()
+    for volume in volumes:
+        print(f"rm {volume}")
+        volume.remove(force=True)
+    return bool(volumes)
+
+
+def remove_networks(client: DockerClient) -> bool:
+    ignore_names = ["bridge", "host", "none"]
+    networks = client.networks.list()
+    network_names = {network.name for network in networks}
+
+    for network in networks:
+        if network.name not in ignore_names:
+            print(f"rm {network}")
+            network.remove()
+    return bool(network_names.difference(set(ignore_names)))
+
+
+def main() -> int:
+    client = docker.from_env()
+
+    input("Remove all Docker stuff?")
+
+    removed = False
+    removed |= remove_images(client)
+    removed |= remove_containers(client)
+    removed |= remove_volumes(client)
+    removed |= remove_networks(client)
+
+    return 0
+
+
+if __name__ == "__main__":
+    exit(main())

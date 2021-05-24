@@ -1,6 +1,7 @@
 import click
 import docker
 from docker import DockerClient
+from docker.errors import DockerException
 
 
 def remove_images(client: DockerClient) -> bool:
@@ -40,7 +41,12 @@ def remove_networks(client: DockerClient) -> bool:
 
 
 def main() -> int:
-    client = docker.from_env()
+    try:
+        client = docker.from_env()
+    except DockerException as err:
+        click.echo("Failed to connect to the Docker daemon", err=True)
+        click.echo(err)
+        return 1
 
     removed = False
     removed |= remove_images(client)

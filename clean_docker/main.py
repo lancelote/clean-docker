@@ -3,6 +3,8 @@ import docker
 from docker import DockerClient
 from docker.errors import DockerException
 
+DAEMON_CONNECTION_FAILURE = "Failed to connect to the Docker daemon"
+
 
 def remove_images(client: DockerClient) -> bool:
     images = client.images.list()
@@ -44,7 +46,7 @@ def main() -> int:
     try:
         client = docker.from_env()
     except DockerException as err:
-        click.echo("Failed to connect to the Docker daemon", err=True)
+        click.echo(DAEMON_CONNECTION_FAILURE, err=True)
         click.echo(err)
         return 1
 

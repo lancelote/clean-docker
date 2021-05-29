@@ -1,3 +1,5 @@
+import sys
+
 import click
 
 from clean_docker.main import main
@@ -5,12 +7,12 @@ from clean_docker.main import main
 
 @click.command(help="Remove Docker images, containers, volumes, and networks")
 @click.version_option()
-def cli() -> int:
+def cli() -> None:
     if click.confirm("Remove all Docker artifacts?"):
-        return main()
+        sys.exit(main())
     else:
         click.echo("Abort", err=True)
-        return 1
+        sys.exit(1)
 
 
 if __name__ == "__main__":
